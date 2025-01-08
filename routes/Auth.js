@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { SignUp } = require('../models'); // Adjust path as necessary
-const {sign} = require("jsonwebtoken");
+const {sign, verify} = require("jsonwebtoken");
 // Secret key for token generation (store securely in environment variables)
-const JWT_SECRET = process.env.JWT_SECRET || "my_current_secrete";
+const JWT_SECRET = process.env.JWT_SECRET || "my_mostrandom_secrete123";
 const cookieParser = require("cookie-parser");
 
 
@@ -34,8 +34,6 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-
-
 // Signin route
 router.post('/signin', async (req, res) => {
     try {
@@ -52,10 +50,10 @@ router.post('/signin', async (req, res) => {
       // If user doesn't exist
       if (!user) {
         return res.status(404).json({ error: 'User not found.' });
-      }
+      } 
 
       // Generate token using destructured `sign`
-    const token = sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "1h" });
+    const token = sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "30d" });
 
     // Set the token as an HTTP-only cookie
     res.cookie("authToken", token, {
@@ -75,21 +73,22 @@ router.post('/signin', async (req, res) => {
     }
   });
 
-  //validate token route
-  router.post("/validate-token", (req, res) => {
-    const token = req.headers.authorization?.split(" ")[1]; // Extract token from the header
+// verify token raoute
+router.post("/verify", (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).json({ error: "Token is required" });
+  }
+
+  try {
+    const decoded = verify(token, JWT_SECRET);
+    res.status(200).json({ message: "Token is valid", user: decoded });
+  } catch (err) {
+    res.status(401).json({ error: "Invalid or expired token" });
+  }
+});
   
-    if (!token) {
-      return res.status(401).json({ error: "Token is required" });
-    }
-  
-    try {
-      const decoded = verify(token, JWT_SECRET);
-      res.status(200).json({ message: "Token is valid", user: decoded });
-    } catch (error) {
-      res.status(401).json({ error: "Invalid or expired token" });
-    }
-  });
 
 
 module.exports = router;
