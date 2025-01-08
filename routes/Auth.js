@@ -60,7 +60,7 @@ router.post('/signin', async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Enable secure cookies in production
       sameSite: "strict",
-      maxAge: 3600000, // 1 hour in milliseconds
+      maxAge: 2592000000, // 30days in milliseconds
     });
   
       // Respond with the token
