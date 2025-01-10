@@ -4,7 +4,7 @@ const { SignUp, VerificationCode } = require('../models'); // Adjust path as nec
 const {sign, verify} = require("jsonwebtoken");
 // Secret key for token generation (store securely in environment variables)
 const JWT_SECRET = process.env.JWT_SECRET || "my_mostrandom_secrete123";
-const EMAIL_PASS = process.env.EMAIL_PASS || 'nixh pfxb wdqp fyxg';
+const EMAIL_PASS = process.env.EMAIL_PASS;
 const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
 
