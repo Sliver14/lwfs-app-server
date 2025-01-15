@@ -107,40 +107,6 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// verify code & signup
-router.post("/verify-signup", async (req, res) => {
-  const { email, code } = req.body;
-
-  try {
-    // Find the record based on email and code
-    const record = await VerificationCode.findOne({ where: { email } });
-
-    // Check if the record exists and if the code is not expired
-    if (!record || new Date(record.expiresAt) < new Date()) {
-      return res.status(400).json({ error: "Invalid or expired code" });
-    }
-
-    // compare provided code
-    const isMatch = bcrypt.compareSync(code, record.code);
-
-    if (!isMatch){
-      return res.status(400).json({error: 'invalid code'});
-    }
-
-     //set data to null
-     await VerificationCode.update(
-      {code: "", expiresAt:0},
-      {where:{email}}
-    )
-    
-    // Send success response
-    res.status(200).json({ message: "Signup was Successfull!"});
-  } catch (error) {
-    console.error("Error during code verification:", error);
-    res.status(500).json({ error: "An error occurred during verification" });
-  }
-});
-
 // Signin route
 router.post('/signin', async (req, res) => {
     try {
@@ -245,6 +211,40 @@ router.post('/signin', async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
+
+// verify code & signup
+router.post("/verify-signup", async (req, res) => {
+  const { email, code } = req.body;
+
+  try {
+    // Find the record based on email and code
+    const record = await VerificationCode.findOne({ where: { email } });
+
+    // Check if the record exists and if the code is not expired
+    if (!record || new Date(record.expiresAt) < new Date()) {
+      return res.status(400).json({ error: "Invalid or expired code" });
+    }
+
+    // compare provided code
+    const isMatch = bcrypt.compareSync(code, record.code);
+
+    if (!isMatch){
+      return res.status(400).json({error: 'invalid code'});
+    }
+
+     //set data to null
+     await VerificationCode.update(
+      {code: "", expiresAt:0},
+      {where:{email}}
+    )
+    
+    // Send success response
+    res.status(200).json({ message: "Signup was Successfull!"});
+  } catch (error) {
+    console.error("Error during code verification:", error);
+    res.status(500).json({ error: "An error occurred during verification" });
+  }
+});
 
 // verify code & sign in
 router.post("/verify-signin", async (req, res) => {
