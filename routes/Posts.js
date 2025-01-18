@@ -10,7 +10,7 @@ router.post("/", async (req, res) => {
 
         const newPost = await PostPage.create({postPhoto, postTitle, postBody});
         
-        res.status(200).json({message: "Successful"});
+        res.status(200).json({message: "Posted Successfully"});
     } catch(error){
         res.status(500).json({error: "Failed"})
     }
