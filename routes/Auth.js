@@ -7,6 +7,13 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
+// const rateLimit = require("express-rate-limit");
+
+// const verifyLimiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 minutes
+//   max: 5, // Limit each IP to 5 requests per windowMs
+//   message: { error: "Too many requests, please try again later." },
+// });
 
 
 
@@ -188,20 +195,9 @@ router.post('/signin', async (req, res) => {
       });
 
     //   // Generate token using destructured `sign`
-    const token = sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "30d" });
+    // const token = sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-    // // Set the token as an HTTP-only cookie
-    // res.cookie("authToken", token, {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === "production", // Enable secure cookies in production
-    //   sameSite: "strict",
-    //   maxAge: 2592000000, // 30days in milliseconds
-    // });
-  
-      // Respond with the token
-      // res.status(200).json({
-      //   message: 'Sign-in successful', token,
-      // });
+    
       res.status(200).json({
         message: 'Check your email for verification code',
       });
@@ -267,7 +263,7 @@ router.post("/verify-signin", async (req, res) => {
     }
 
     // Generate a JWT token
-    const token = jwt.sign({ id: record.id, email: record.email }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    const token = jwt.sign({ id: record.id, email: record.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
     //set data to null
     await VerificationCode.update(
@@ -287,7 +283,7 @@ router.post("/verify-signin", async (req, res) => {
 
 // verify token route
 router.post("/verify", (req, res) => {
-  const { token } = req.body;
+  const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
 
   if (!token) {
     return res.status(400).json({ error: "Token is required" });
@@ -296,8 +292,9 @@ router.post("/verify", (req, res) => {
   try {
     const decoded = verify(token, process.env.JWT_SECRET);
     res.status(200).json({ message: "Token is valid", user: decoded });
+    
   } catch (error) {
-    console.error("Token verification failed:", error.message);
+    console.error("Token verification failed:", error); // Log error without revealing details
     res.status(401).json({ error: "Invalid or expired token" });
   }
 });
