@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
+
 // const rateLimit = require("express-rate-limit");
 
 // const verifyLimiter = rateLimit({
@@ -265,6 +266,14 @@ router.post("/verify-signin", async (req, res) => {
     // Generate a JWT token
     const token = jwt.sign({ id: record.id, email: record.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
+    // Send the token as a secure HTTP-only cookie
+    res.cookie("authToken", token, {
+      httpOnly: true, // Prevent access from JavaScript
+      secure: process.env.NODE_ENV === "production",   // Use HTTPS
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     //set data to null
     await VerificationCode.update(
       {code: "", expiresAt:0},
@@ -279,24 +288,49 @@ router.post("/verify-signin", async (req, res) => {
   }
 });
 
-
-
 // verify token route
-router.post("/verify", (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
+// router.post("/verify", (req, res) => {
+//   // Extract the token from cookies
+//   const token = req.cookies.authToken; // Assuming the cookie is named 'authToken'
+//   console.log("Extracted Token from Cookie:", token);
+
+//   if (!token) {
+//     return res.status(400).json({ error: "Token is required" });
+//   }
+
+//   try {
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//     console.log("Decoded Token:", decoded); // Log the decoded token for debugging
+//     res.status(200).json({ message: "Token is valid", user: decoded });
+//   } catch (error) {
+//     console.error("Token verification failed:", error.message); // Log error without revealing details
+//     res.status(401).json({ error: "Invalid or expired token" });
+//   }
+// });
+
+// Token verification rojte
+router.get("/verify", async (req, res) => {
+  const token = req.cookies.authToken; // Get token from the cookie
 
   if (!token) {
-    return res.status(400).json({ error: "Token is required" });
+    return res.status(400).json({ valid: false, error: "Token is required" });
   }
 
   try {
-    const decoded = verify(token, process.env.JWT_SECRET);
-    res.status(200).json({ message: "Token is valid", user: decoded });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const email = decoded.email;
+
+    const user = await SignUp.findOne({where:{email}});
     
+    if (!user) {
+      return res.status(404).json({message: 'user not found'});
+    }
+
+    res.status(200).json({valid: true, user:{ id: user.id, firstName: user.firstName, email: user.email } });
   } catch (error) {
-    console.error("Token verification failed:", error); // Log error without revealing details
-    res.status(401).json({ error: "Invalid or expired token" });
+    res.status(403).json({ valid: false, error: "Invalid or expired token" });
   }
 });
+
 
 module.exports = router;

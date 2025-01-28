@@ -2,18 +2,27 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
-
-app.use(express.json());
-app.use(cors());
-
+const allowedOrigins = process.env.ALLOWED_ORIGIN || "http://localhost:5173" // 
+const cookieParser = require('cookie-parser');
+const CommentRouter = require("./routes/Comment");
+const PostRouter = require("./routes/Posts");
+const AuthRouter = require("./routes/Auth");
 const db = require("./models");
 
-// Routers
-const AuthRouter = require("./routes/Auth");
-app.use("/auth", AuthRouter);
+app.use(cookieParser());
 
-const PostRouter = require("./routes/Posts");
+app.use(express.json());
+app.use(
+    cors({
+        origin: allowedOrigins,
+        credentials: true,
+      })
+    );
+
+// Routers
+app.use("/auth", AuthRouter);
 app.use("/posts", PostRouter);
+app.use("/comment", CommentRouter);
 
 
 const PORT = process.env.PORT || 3001; // Use PORT from environment or default to 3001
