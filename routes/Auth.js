@@ -281,7 +281,7 @@ router.post("/verify-signin", async (req, res) => {
     res.cookie("authToken", token, {
       httpOnly: true, // Prevent access from JavaScript
       secure: process.env.NODE_ENV === "production",   // Use HTTPS
-      sameSite: "strict",
+      sameSite: "None",
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
@@ -298,6 +298,7 @@ router.post("/verify-signin", async (req, res) => {
     res.status(500).json({ error: "An error occurred during verification" });
   }
 });
+
 
 // verify token route
 // router.post("/verify", (req, res) => {
