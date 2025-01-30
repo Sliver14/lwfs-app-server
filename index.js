@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
-const allowedOrigins = process.env.ALLOWED_ORIGIN || "http://localhost:5173" // 
+const allowedOrigins = process.env.ALLOWED_ORIGIN // || "http://localhost:5173"  
 const cookieParser = require('cookie-parser');
 const CommentRouter = require("./routes/Comment");
 const PostRouter = require("./routes/Posts");

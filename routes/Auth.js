@@ -229,6 +229,17 @@ router.post("/verify-signup", async (req, res) => {
       return res.status(400).json({error: 'invalid code'});
     }
 
+    // // Generate a JWT token
+    // const token = jwt.sign({ id: record.id, email: record.email }, process.env.JWT_SECRET, { expiresIn: '30d' });
+
+    // // Send the token as a secure HTTP-only cookie
+    // res.cookie("authToken", token, {
+    //   httpOnly: true, // Prevent access from JavaScript
+    //   secure: process.env.NODE_ENV === "production",   // Use HTTPS
+    //   sameSite: "strict",
+    //   maxAge: 30 * 24 * 60 * 60 * 1000,
+    // });
+
      //set data to null
      await VerificationCode.update(
       {code: "", expiresAt:0},
@@ -264,14 +275,14 @@ router.post("/verify-signin", async (req, res) => {
     }
 
     // Generate a JWT token
-    const token = jwt.sign({ id: record.id, email: record.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: record.id, email: record.email }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
     // Send the token as a secure HTTP-only cookie
     res.cookie("authToken", token, {
       httpOnly: true, // Prevent access from JavaScript
       secure: process.env.NODE_ENV === "production",   // Use HTTPS
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
     //set data to null
@@ -308,7 +319,7 @@ router.post("/verify-signin", async (req, res) => {
 //   }
 // });
 
-// Token verification rojte
+// Token verification route
 router.get("/verify", async (req, res) => {
   const token = req.cookies.authToken; // Get token from the cookie
 
@@ -326,7 +337,7 @@ router.get("/verify", async (req, res) => {
       return res.status(404).json({message: 'user not found'});
     }
 
-    res.status(200).json({valid: true, user:{ id: user.id, firstName: user.firstName, email: user.email } });
+    res.status(200).json({valid: true, user:{ id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, zone: user.zone } });
   } catch (error) {
     res.status(403).json({ valid: false, error: "Invalid or expired token" });
   }

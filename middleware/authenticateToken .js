@@ -24,7 +24,10 @@ const authenticateToken = async (req, res, next) => {
     req.user = {
       id: user.id,
       firstName: user.firstName,
+      lastName: user.lastName,
+      zone: user.zone,
       email: user.email,
+
     };
 
     // Proceed to the next middleware or route handler
