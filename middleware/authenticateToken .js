@@ -27,6 +27,7 @@ const authenticateToken = async (req, res, next) => {
       lastName: user.lastName,
       zone: user.zone,
       email: user.email,
+      country: user.country,
 
     };
 

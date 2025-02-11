@@ -24,6 +24,10 @@ const Attendance = sequelize.define("Attendance", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  country: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   groupParticipation: {
     type: DataTypes.STRING,
     allowNull: true,

@@ -18,13 +18,17 @@ module.exports = (sequelize, DataTypes) => {
                     isAlpha: true,
                 },
             },
-            countryCode: {
+            // countryCode: {
+            //     type: DataTypes.STRING,
+            //     allowNull: false,
+            //     validate: {
+            //         notEmpty: true,
+            //         len: [1, 5],
+            //     },
+            // },
+            country: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                validate: {
-                    notEmpty: true,
-                    len: [1, 5],
-                },
             },
             phoneNumber: {
                 type: DataTypes.STRING,
@@ -43,6 +47,7 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
+            
             email: {
                 type: DataTypes.STRING,
                 allowNull: false,
@@ -51,6 +56,15 @@ module.exports = (sequelize, DataTypes) => {
                     isEmail: true,
                 },
             },
+            verificationCode: {
+                type: DataTypes.STRING,
+                allowNull: false, 
+            },
+            verified: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false, 
+            },
+
         },
         {
             timestamps: true,
