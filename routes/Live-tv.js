@@ -6,7 +6,6 @@ const cookieParser = require("cookie-parser");
 const authenticateToken = require('../middleware/authenticateToken ');
 const { where, Op } = require('sequelize');
 
-
 module.exports = (io) => {
 //live-tv comment 
 router.post('/comment', authenticateToken, async (req, res) => {
